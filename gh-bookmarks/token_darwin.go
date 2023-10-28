@@ -33,10 +33,6 @@ func storeToken(token string) error {
 
 // getToken retrieves the GitHub access token from keychain
 func getToken() ([]byte, error) {
-	// ring, _ := keyring.Open(keyring.Config{
-	// 	ServiceName: "github.com",
-	// })
-
 	i, err := ring.Get("token")
 	if err != nil {
 		return []byte{}, err
