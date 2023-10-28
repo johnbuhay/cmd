@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v38/github"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 // GitHubClient embeds the github.Client so I can create this "class"
@@ -34,16 +35,16 @@ func (gh *GitHubClient) GetGitHubOrg() string {
 	return org
 }
 
-func readGitHubToken(tokenPath string) (string, error) {
-	token, err := os.ReadFile(tokenPath)
+func readGitHubToken() (string, error) {
+	secret, err := getToken()
 	if err != nil {
-		return "", err
+		return string(secret), err
 	}
-	return strings.TrimSpace(string(token)), nil
+	return strings.TrimSpace(string(secret)), nil
 }
 
-func writeGitHubToken(tokenPath, token string) error {
-	return os.WriteFile(tokenPath, []byte(token), 0600)
+func writeGitHubToken(input string) error {
+	return storeToken(input)
 }
 
 // GetGitHubUsername returns the username associated with the provided token, otherwise returns with error
@@ -53,6 +54,19 @@ func (gh *GitHubClient) GetGitHubUsername() (string, error) {
 		return "", err
 	}
 	return *user.Login, nil
+}
+
+// getGitHubTokenFromUser reads input from the user without echoing it to the terminal
+func getGitHubTokenFromUser() (string, error) {
+	fmt.Print("GitHub access token not found. Please enter your GitHub access token: ")
+	bytePassword, err := terminal.ReadPassword(int(os.Stdin.Fd()))
+	fmt.Println()
+
+	if err != nil {
+		return "", err
+	}
+	p := string(bytePassword)
+	return p, nil
 }
 
 func (gh *GitHubClient) GetOrgRepositories() ([]*github.Repository, error) {
