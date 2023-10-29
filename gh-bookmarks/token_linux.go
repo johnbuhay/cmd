@@ -14,7 +14,6 @@ func init() {
 		ServiceName:     "github-token",
 		AllowedBackends: []keyring.BackendType{keyring.KeyCtlBackend},
 		KeyCtlScope:     "session",
-		// KeyCtlPerm:      0x3f3f0000, // "alswrvalswrv------------"
 	})
 
 	if err != nil {
